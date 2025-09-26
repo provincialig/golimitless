@@ -27,9 +27,11 @@ func SliceMap[T any, K any](slice []T, fn func(el T) (K, error)) ([]K, error) {
 	return result, nil
 }
 
-func SliceForEach[T any](slice []T, fn func(el T)) {
+func SliceForEach[T any](slice []T, fn func(el T) bool) {
 	for _, el := range slice {
-		fn(el)
+		if !fn(el) {
+			return
+		}
 	}
 }
 
