@@ -11,7 +11,8 @@ go get github.com/provincialig/golimitless
 
 - **Data structures**
   - **SafeSet**: A thread-safe typed implementation of Set with many helpful methods.
-  - **SageMap**: A thread-safe typed implementation of Map with many helpful methods.
+  - **SafeMap**: A thread-safe typed implementation of Map with many helpful methods.
+  - **IndexedSlice**: A thread-safe key-value map where value is a slice, with many helpful methods.
 
 - **Slice utils**
   - **Filter**
