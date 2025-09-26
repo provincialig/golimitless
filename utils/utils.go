@@ -7,13 +7,15 @@ import (
 )
 
 func JoinChannels[T any](subscriptions []<-chan T, bufferSize ...int) <-chan T {
-	buff := 1000
+	var buff = 1000
 	if len(bufferSize) > 0 {
 		buff = bufferSize[0]
 	}
 
-	var wg sync.WaitGroup
-	out := make(chan T, buff)
+	var (
+		wg  sync.WaitGroup
+		out chan T = make(chan T, buff)
+	)
 
 	go func() {
 		for _, ch := range subscriptions {
