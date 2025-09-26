@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.25-alpine
+
+    steps:
+      - name: Install tools
+        run: apk add --no-cache git make bash
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download dependencies
+        run: go mod tidy
+
+      - name: Run tests
+        run: go test ./... -v
