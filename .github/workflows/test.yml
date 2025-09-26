@@ -27,7 +27,11 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    container:
+      image: golang:1.25-alpine
+
     continue-on-error: true
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
