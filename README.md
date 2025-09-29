@@ -10,8 +10,10 @@ go get github.com/provincialig/golimitless
 #### Tools
 
 - **Data structures**
-  - **SafeSet**: A thread-safe typed implementation of Set with many helpful methods.
-  - **SafeMap**: A thread-safe typed implementation of Map with many helpful methods.
+  - **Stack**: A thread-safe typed implementation of Stack.
+  - **Set**: A thread-safe typed implementation of Set with many helpful methods.
+  - **Map**: A thread-safe typed implementation of key-value map with many helpful methods.
+  - **DoubleMap**: A double layer thread-safe key-value map, with many helpful methods.
   - **IndexedSlice**: A thread-safe key-value map where value is a slice, with many helpful methods.
 
 - **Slice utils**
@@ -19,6 +21,7 @@ go get github.com/provincialig/golimitless
   - **Map**
   - **Reduce**
   - **ForEach**
+  - **SliceToMap** / **MapToSlice**
 
 - **Sync**
   - **MutexBlock**: A tool used for execute many operations in safe block.

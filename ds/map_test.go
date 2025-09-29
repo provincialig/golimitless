@@ -1,4 +1,4 @@
-package test
+package ds_test
 
 import (
 	"provincialig/golimitless/ds"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestMapSize(t *testing.T) {
-	m := ds.NewSafeMap[int, int]()
+	m := ds.NewMap[int, int]()
 	m.Set(1, 2)
 	m.Set(2, 2)
 	m.Set(1, 3)

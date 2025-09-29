@@ -1,4 +1,4 @@
-package test
+package ds_test
 
 import (
 	"provincialig/golimitless/ds"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestSetSize(t *testing.T) {
-	set := ds.NewSafeSet[int]()
+	set := ds.NewSet[int]()
 	set.Add(1, 2, 3, 4)
 	set.Remove(2, 1, 5)
 	set.Add(6)
@@ -18,10 +18,10 @@ func TestSetSize(t *testing.T) {
 }
 
 func TestSetUnion(t *testing.T) {
-	a := ds.NewSafeSet[int]()
+	a := ds.NewSet[int]()
 	a.Add(1, 2, 3, 4)
 
-	b := ds.NewSafeSet[int]()
+	b := ds.NewSet[int]()
 	b.Add(2, 3, 4, 5)
 
 	sum := 0
@@ -38,10 +38,10 @@ func TestSetUnion(t *testing.T) {
 }
 
 func TestSetIntersect(t *testing.T) {
-	a := ds.NewSafeSet[int]()
+	a := ds.NewSet[int]()
 	a.Add(1, 2, 3, 4)
 
-	b := ds.NewSafeSet[int]()
+	b := ds.NewSet[int]()
 	b.Add(2, 3, 4, 5)
 
 	sum := 0
@@ -58,10 +58,10 @@ func TestSetIntersect(t *testing.T) {
 }
 
 func TestSetDifference(t *testing.T) {
-	a := ds.NewSafeSet[int]()
+	a := ds.NewSet[int]()
 	a.Add(1, 2, 3, 4)
 
-	b := ds.NewSafeSet[int]()
+	b := ds.NewSet[int]()
 	b.Add(2, 3, 4, 5)
 
 	sum := 0

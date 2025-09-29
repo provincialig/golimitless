@@ -13,7 +13,7 @@ type IndexedSlice[T comparable, K comparable] interface {
 }
 
 type myIndexedSlice[T comparable, K comparable] struct {
-	m SafeMap[T, *[]K]
+	m Map[T, *[]K]
 }
 
 func (is *myIndexedSlice[T, K]) Get(key T) ([]K, bool) {
@@ -57,6 +57,6 @@ func (is *myIndexedSlice[T, K]) IsEmpty(key T) bool {
 
 func NewIndexedSlice[T comparable, K comparable]() IndexedSlice[T, K] {
 	return &myIndexedSlice[T, K]{
-		m: NewSafeMap[T, *[]K](),
+		m: NewMap[T, *[]K](),
 	}
 }
