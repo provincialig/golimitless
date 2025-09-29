@@ -7,20 +7,23 @@ import (
 	"time"
 )
 
+// Iif implementa l'operatore ternario: condition ? true : false
+func Iif[T any](condition bool, isTrue T, isFalse T) T {
+	if condition {
+		return isTrue
+	}
+	return isFalse
+}
+
 // JoinChannels unisce più channel in un unico.
 // Il channel di ritorno verrà chiuso in automatico quando tutti i channel iniziali saranno chiusi.
 //
 // Default buffer size: 1000
 func JoinChannels[T any](channels []<-chan T, bufferSize ...int) <-chan T {
-	var buff = 1000
-	if len(bufferSize) > 0 {
-		buff = bufferSize[0]
-	}
+	var wg sync.WaitGroup
 
-	var (
-		wg  sync.WaitGroup
-		out = make(chan T, buff)
-	)
+	buff := Iif(len(bufferSize) > 0, bufferSize[0], 1000)
+	out := make(chan T, buff)
 
 	go func() {
 		for _, ch := range channels {
