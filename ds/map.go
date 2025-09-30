@@ -30,7 +30,12 @@ type myMap[T comparable, K any] struct {
 
 func (m *myMap[T, K]) Get(key T) (K, bool) {
 	v, ok := m.m.Load(key)
-	return v.(K), ok
+	if !ok {
+		var zero K
+		return zero, false
+	}
+
+	return v.(K), true
 }
 
 func (m *myMap[T, K]) Set(key T, value K) {
