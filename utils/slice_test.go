@@ -1,0 +1,90 @@
+package utils_test
+
+import (
+	"reflect"
+	"testing"
+
+	"provincialig/golimitless/utils"
+)
+
+func TestSlice(t *testing.T) {
+	t.Run("SliceFilter", func(t *testing.T) {
+		in := []int{1, 2, 3, 4, 5, 6}
+		out := utils.SliceFilter(in, func(el int) bool { return el%2 == 0 })
+		expected := []int{2, 4, 6}
+		if !reflect.DeepEqual(out, expected) {
+			t.Fatalf("expected %v, got %v", expected, out)
+		}
+
+		// empty input
+		empty := utils.SliceFilter([]int{}, func(el int) bool { return true })
+		if len(empty) != 0 {
+			t.Fatalf("expected empty slice, got %v", empty)
+		}
+
+		// predicate always false
+		none := utils.SliceFilter(in, func(el int) bool { return false })
+		if len(none) != 0 {
+			t.Fatalf("expected empty slice, got %v", none)
+		}
+	})
+
+	t.Run("SliceMap", func(t *testing.T) {
+		in := []int{1, 2, 3}
+		out := utils.SliceMap(in, func(el int) int { return el * 2 })
+		expected := []int{2, 4, 6}
+		if !reflect.DeepEqual(out, expected) {
+			t.Fatalf("expected %v, got %v", expected, out)
+		}
+
+		// map to another type
+		out2 := utils.SliceMap(in, func(el int) string { return string(rune('a' + el - 1)) })
+		expected2 := []string{"a", "b", "c"}
+		if !reflect.DeepEqual(out2, expected2) {
+			t.Fatalf("expected %v, got %v", expected2, out2)
+		}
+	})
+
+	t.Run("SliceReduce", func(t *testing.T) {
+		in := []int{1, 2, 3, 4}
+		sum := utils.SliceReduce(in, 0, func(acc int, el int) int { return acc + el })
+		if sum != 10 {
+			t.Fatalf("expected 10, got %d", sum)
+		}
+
+		concat := utils.SliceReduce([]string{"go", "-", "limitless"}, "", func(acc string, el string) string { return acc + el })
+		if concat != "go-limitless" {
+			t.Fatalf("expected 'go-limitless', got %q", concat)
+		}
+	})
+
+	t.Run("SliceForEach", func(t *testing.T) {
+		in := []int{1, 2, 3, 4, 5}
+		sum := 0
+		count := 0
+		utils.SliceForEach(in, func(el int) bool {
+			if el >= 3 {
+				return false
+			}
+			sum += el
+			count++
+			return true
+		})
+		if sum != 3 {
+			t.Fatalf("expected sum 3 (1+2), got %d", sum)
+		}
+		if count != 2 {
+			t.Fatalf("expected count 2, got %d", count)
+		}
+	})
+
+	t.Run("MapToSlice/SliceToMap", func(t *testing.T) {
+		m := map[int]string{1: "a", 2: "b", 3: "c"}
+		s := utils.MapToSlice(m)
+		// order is not guaranteed; verify by converting back
+		back := utils.SliceToMap(s)
+		if !reflect.DeepEqual(back, m) {
+			t.Fatalf("expected %v, got %v", m, back)
+		}
+	})
+}
