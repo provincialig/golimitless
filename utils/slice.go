@@ -12,19 +12,24 @@ func SliceFilter[T any](silce []T, fn func(el T) bool) []T {
 	return result
 }
 
-func SliceMap[T any, K any](slice []T, fn func(el T) (K, error)) ([]K, error) {
+func SliceMap[T any, K any](slice []T, fn func(el T) K) []K {
 	result := []K{}
 
 	for _, el := range slice {
-		r, err := fn(el)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, r)
+		result = append(result, fn(el))
 	}
 
-	return result, nil
+	return result
+}
+
+func SliceReduce[T any, K any](slice []T, initial K, fn func(acc K, el T) K) K {
+	acc := initial
+
+	for _, el := range slice {
+		acc = fn(acc, el)
+	}
+
+	return acc
 }
 
 func SliceForEach[T any](slice []T, fn func(el T) bool) {
@@ -33,20 +38,6 @@ func SliceForEach[T any](slice []T, fn func(el T) bool) {
 			return
 		}
 	}
-}
-
-func SliceReduce[T any, K any](slice []T, initial K, fn func(acc K, el T) (K, error)) (K, error) {
-	acc := initial
-
-	for _, el := range slice {
-		v, err := fn(acc, el)
-		if err != nil {
-			return acc, err
-		}
-		acc = v
-	}
-
-	return acc, nil
 }
 
 type SliceItem[T any, K any] struct {
