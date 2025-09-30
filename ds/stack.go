@@ -29,7 +29,7 @@ func (s *myStack[T]) Pop() T {
 	defer s.mut.Unlock()
 
 	val := s.s[len(s.s)-1]
-	s.s = s.s[:len(s.s)-2]
+	s.s = s.s[:len(s.s)-1]
 	return val
 }
 
