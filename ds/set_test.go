@@ -77,4 +77,38 @@ func TestSet(t *testing.T) {
 			t.Fatal(difference.ToSlice())
 		}
 	})
+
+	t.Run("Has & Remove", func(t *testing.T) {
+		set := ds.NewSet[int]()
+		set.Add(1, 2)
+		if !set.Has(1) || !set.Has(2) {
+			t.Fatal("set should contain 1 and 2")
+		}
+		set.Remove(2)
+		if set.Has(2) {
+			t.Fatal("set should not contain 2 after remove")
+		}
+	})
+
+	t.Run("Range", func(t *testing.T) {
+		set := ds.NewSet[int]()
+		set.Add(1, 2, 3)
+		sum := 0
+		set.Range(func(value int) bool {
+			sum += value
+			return true
+		})
+		if sum != 6 {
+			t.Fatalf("expected sum 6, got %d", sum)
+		}
+	})
+
+	t.Run("ToSlice", func(t *testing.T) {
+		set := ds.NewSet[string]()
+		set.Add("a", "b")
+		slice := set.ToSlice()
+		if len(slice) != 2 {
+			t.Fatalf("slice length should be 2, got %d", len(slice))
+		}
+	})
 }

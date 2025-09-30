@@ -79,4 +79,34 @@ func TestIndexedSlice(t *testing.T) {
 			t.Fatal("Index 2 must be not contains element 2")
 		}
 	})
+
+	t.Run("IsEmpty", func(t *testing.T) {
+		s := ds.NewIndexedSlice[int, int]()
+		if s.IsEmpty(1) {
+			t.Fatal("IsEmpty should be false for non-existent key (len undefined)")
+		}
+		s.Append(1, 10)
+		if s.IsEmpty(1) {
+			t.Fatal("IsEmpty should be false when one element exists")
+		}
+		s.Remove(1, 0)
+		if !s.IsEmpty(1) {
+			t.Fatal("IsEmpty should be true after removing the only element")
+		}
+	})
+
+	t.Run("Delete key", func(t *testing.T) {
+		s := ds.NewIndexedSlice[int, int]()
+		s.Append(1, 1)
+		s.Append(1, 2)
+		s.Append(2, 3)
+
+		s.Delete(1)
+		if s.Has(1) {
+			t.Fatal("key 1 should be deleted")
+		}
+		if !s.Has(2) {
+			t.Fatal("key 2 should still exist")
+		}
+	})
 }

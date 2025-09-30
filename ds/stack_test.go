@@ -100,4 +100,29 @@ func TestStack(t *testing.T) {
 			t.Fatalf("Final size: %d", initialSize)
 		}
 	})
+
+	t.Run("Iterate", func(t *testing.T) {
+		s := ds.NewStack[int]()
+		s.Push(1)
+		s.Push(2)
+		s.Push(3)
+
+		sum := 0
+		count := 0
+		s.Iterate(func(value int) bool {
+			sum += value
+			count++
+			return true
+		})
+
+		if sum != 6 {
+			t.Fatalf("sum should be 6, got %d", sum)
+		}
+		if count != 3 {
+			t.Fatalf("count should be 3, got %d", count)
+		}
+		if !s.IsEmpty() {
+			t.Fatal("stack should be empty after Iterate")
+		}
+	})
 }
