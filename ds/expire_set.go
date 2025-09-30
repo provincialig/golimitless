@@ -12,6 +12,7 @@ type ExpireSet[T comparable] interface {
 	ExpireTime(value T) (time.Time, bool)
 	Iterator(fn func(value T) bool)
 	Clear()
+	IsEmpty() bool
 }
 
 type myExpireSet[T comparable] struct {
@@ -81,6 +82,15 @@ func (es *myExpireSet[T]) Iterator(fn func(value T) bool) {
 			}
 		}
 	}
+}
+
+func (es *myExpireSet[T]) IsEmpty() bool {
+	found := false
+	es.Iterator(func(value T) bool {
+		found = true
+		return false
+	})
+	return !found
 }
 
 func NewExpireSet[T comparable]() ExpireSet[T] {
