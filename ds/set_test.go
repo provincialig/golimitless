@@ -5,74 +5,76 @@ import (
 	"testing"
 )
 
-func TestSetSize(t *testing.T) {
-	set := ds.NewSet[int]()
-	set.Add(1, 2, 3, 4)
-	set.Remove(2, 1, 5)
-	set.Add(6)
+func TestSet(t *testing.T) {
+	t.Run("Size", func(t *testing.T) {
+		set := ds.NewSet[int]()
+		set.Add(1, 2, 3, 4)
+		set.Remove(2, 1, 5)
+		set.Add(6)
 
-	size := set.Size()
-	if size != 3 {
-		t.Fatal(size)
-	}
-}
-
-func TestSetUnion(t *testing.T) {
-	a := ds.NewSet[int]()
-	a.Add(1, 2, 3, 4)
-
-	b := ds.NewSet[int]()
-	b.Add(2, 3, 4, 5)
-
-	sum := 0
-
-	union := a.Union(b)
-	union.Range(func(value int) bool {
-		sum += value
-		return true
+		size := set.Size()
+		if size != 3 {
+			t.Fatal(size)
+		}
 	})
 
-	if sum != 15 {
-		t.Fatal(union.ToSlice())
-	}
-}
+	t.Run("Union", func(t *testing.T) {
+		a := ds.NewSet[int]()
+		a.Add(1, 2, 3, 4)
 
-func TestSetIntersect(t *testing.T) {
-	a := ds.NewSet[int]()
-	a.Add(1, 2, 3, 4)
+		b := ds.NewSet[int]()
+		b.Add(2, 3, 4, 5)
 
-	b := ds.NewSet[int]()
-	b.Add(2, 3, 4, 5)
+		sum := 0
 
-	sum := 0
+		union := a.Union(b)
+		union.Range(func(value int) bool {
+			sum += value
+			return true
+		})
 
-	intersect := a.Intersect(b)
-	intersect.Range(func(value int) bool {
-		sum += value
-		return true
+		if sum != 15 {
+			t.Fatal(union.ToSlice())
+		}
 	})
 
-	if sum != 9 {
-		t.Fatal(intersect.ToSlice())
-	}
-}
+	t.Run("Intersection", func(t *testing.T) {
+		a := ds.NewSet[int]()
+		a.Add(1, 2, 3, 4)
 
-func TestSetDifference(t *testing.T) {
-	a := ds.NewSet[int]()
-	a.Add(1, 2, 3, 4)
+		b := ds.NewSet[int]()
+		b.Add(2, 3, 4, 5)
 
-	b := ds.NewSet[int]()
-	b.Add(2, 3, 4, 5)
+		sum := 0
 
-	sum := 0
+		intersect := a.Intersect(b)
+		intersect.Range(func(value int) bool {
+			sum += value
+			return true
+		})
 
-	difference := a.Difference(b)
-	difference.Range(func(value int) bool {
-		sum += value
-		return true
+		if sum != 9 {
+			t.Fatal(intersect.ToSlice())
+		}
 	})
 
-	if sum != 1 {
-		t.Fatal(difference.ToSlice())
-	}
+	t.Run("Difference", func(t *testing.T) {
+		a := ds.NewSet[int]()
+		a.Add(1, 2, 3, 4)
+
+		b := ds.NewSet[int]()
+		b.Add(2, 3, 4, 5)
+
+		sum := 0
+
+		difference := a.Difference(b)
+		difference.Range(func(value int) bool {
+			sum += value
+			return true
+		})
+
+		if sum != 1 {
+			t.Fatal(difference.ToSlice())
+		}
+	})
 }

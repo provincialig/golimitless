@@ -5,14 +5,16 @@ import (
 	"testing"
 )
 
-func TestMapSize(t *testing.T) {
-	m := ds.NewMap[int, int]()
-	m.Set(1, 2)
-	m.Set(2, 2)
-	m.Set(1, 3)
+func TestMap(t *testing.T) {
+	t.Run("Size", func(t *testing.T) {
+		m := ds.NewMap[int, int]()
+		m.Set(1, 2)
+		m.Set(2, 2)
+		m.Set(1, 3)
 
-	size := m.Size()
-	if size != 2 {
-		t.Fatal(size)
-	}
+		size := m.Size()
+		if size != 2 {
+			t.Fatal(size)
+		}
+	})
 }
