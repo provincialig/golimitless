@@ -20,9 +20,6 @@ type myExpireSet[T comparable] struct {
 }
 
 func (es *myExpireSet[T]) get(value T) (time.Time, bool) {
-	es.mut.Lock()
-	defer es.mut.Unlock()
-
 	v, ok := es.m[value]
 	if !ok {
 		return time.Time{}, false
@@ -44,6 +41,9 @@ func (es *myExpireSet[T]) Add(value T, retain time.Duration) {
 }
 
 func (es *myExpireSet[T]) Has(value T) bool {
+	es.mut.Lock()
+	defer es.mut.Unlock()
+
 	_, ok := es.get(value)
 	return ok
 }
@@ -56,6 +56,9 @@ func (es *myExpireSet[T]) Delete(value T) {
 }
 
 func (es *myExpireSet[T]) ExpireTime(value T) (time.Time, bool) {
+	es.mut.Lock()
+	defer es.mut.Unlock()
+
 	v, ok := es.get(value)
 	return v, ok
 }
@@ -71,11 +74,11 @@ func (es *myExpireSet[T]) Iterator(fn func(value T) bool) {
 	es.mut.Lock()
 	defer es.mut.Unlock()
 
-	for k, v := range es.m {
-		if time.Now().After(v) {
-			delete(es.m, k)
-		} else if !fn(k) {
-			return
+	for k := range es.m {
+		if _, ok := es.get(k); ok {
+			if !fn(k) {
+				return
+			}
 		}
 	}
 }
