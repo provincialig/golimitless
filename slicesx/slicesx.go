@@ -1,9 +1,9 @@
 package slicesx
 
-func Filter[T any](silce []T, fn func(el T) bool) []T {
+func Filter[T any](slice []T, fn func(el T) bool) []T {
 	result := []T{}
 
-	for _, el := range silce {
+	for _, el := range slice {
 		if fn(el) {
 			result = append(result, el)
 		}
