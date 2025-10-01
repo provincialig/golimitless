@@ -11,9 +11,9 @@ go get github.com/provincialig/golimitless
 
 - **Data structures**
   - **Stack**: A thread-safe typed implementation of Stack.
-  - **Set**: A thread-safe typed implementation of Set with many helpful methods.
+  - **SetX**: A thread-safe typed implementation of Set with many helpful methods.
   - **ExpireSet**: A thread-safe typed implementation of Set where the elements will removed after retain time.
-  - **SuperMap**: A thread-safe typed implementation of key-value map with many helpful methods.
+  - **MapX**: A thread-safe typed implementation of key-value map with many helpful methods.
   - **DoubleMap**: A double layer thread-safe key-value map, with many helpful methods.
   - **ISlice**: A thread-safe key-value map where value is a slice, with many helpful methods.
 

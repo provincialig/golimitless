@@ -1,13 +1,13 @@
-package set_test
+package setx_test
 
 import (
 	"testing"
 
-	"github.com/provincialig/golimitless/set"
+	"github.com/provincialig/golimitless/setx"
 )
 
 func Test_Size(t *testing.T) {
-	set := set.New[int]()
+	set := setx.New[int]()
 	set.Add(1, 2, 3, 4)
 	set.Remove(2, 1, 5)
 	set.Add(6)
@@ -19,10 +19,10 @@ func Test_Size(t *testing.T) {
 }
 
 func Test_Union(t *testing.T) {
-	a := set.New[int]()
+	a := setx.New[int]()
 	a.Add(1, 2, 3, 4)
 
-	b := set.New[int]()
+	b := setx.New[int]()
 	b.Add(2, 3, 4, 5)
 
 	sum := 0
@@ -39,10 +39,10 @@ func Test_Union(t *testing.T) {
 }
 
 func Test_Intersection(t *testing.T) {
-	a := set.New[int]()
+	a := setx.New[int]()
 	a.Add(1, 2, 3, 4)
 
-	b := set.New[int]()
+	b := setx.New[int]()
 	b.Add(2, 3, 4, 5)
 
 	sum := 0
@@ -59,10 +59,10 @@ func Test_Intersection(t *testing.T) {
 }
 
 func Test_Difference(t *testing.T) {
-	a := set.New[int]()
+	a := setx.New[int]()
 	a.Add(1, 2, 3, 4)
 
-	b := set.New[int]()
+	b := setx.New[int]()
 	b.Add(2, 3, 4, 5)
 
 	sum := 0
@@ -79,7 +79,7 @@ func Test_Difference(t *testing.T) {
 }
 
 func Test_Has_Remove(t *testing.T) {
-	set := set.New[int]()
+	set := setx.New[int]()
 	set.Add(1, 2)
 	if !set.Has(1) || !set.Has(2) {
 		t.Fatal("set should contain 1 and 2")
@@ -91,7 +91,7 @@ func Test_Has_Remove(t *testing.T) {
 }
 
 func Test_Range(t *testing.T) {
-	set := set.New[int]()
+	set := setx.New[int]()
 	set.Add(1, 2, 3)
 	sum := 0
 	set.Range(func(value int) bool {
@@ -104,7 +104,7 @@ func Test_Range(t *testing.T) {
 }
 
 func Test_ToSlice(t *testing.T) {
-	set := set.New[string]()
+	set := setx.New[string]()
 	set.Add("a", "b")
 	slice := set.ToSlice()
 	if len(slice) != 2 {

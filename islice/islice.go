@@ -3,7 +3,7 @@ package islice
 import (
 	"slices"
 
-	"github.com/provincialig/golimitless/supermap"
+	"github.com/provincialig/golimitless/mapx"
 )
 
 type ISlice[T comparable, K comparable] interface {
@@ -17,7 +17,7 @@ type ISlice[T comparable, K comparable] interface {
 }
 
 type myIndexedSlice[T comparable, K comparable] struct {
-	m supermap.SuperMap[T, *[]K]
+	m mapx.MapX[T, *[]K]
 }
 
 func (is *myIndexedSlice[T, K]) Get(key T) ([]K, bool) {
@@ -64,6 +64,6 @@ func (is *myIndexedSlice[T, K]) IsEmpty(key T) bool {
 
 func New[T comparable, K comparable]() ISlice[T, K] {
 	return &myIndexedSlice[T, K]{
-		m: supermap.New[T, *[]K](),
+		m: mapx.New[T, *[]K](),
 	}
 }

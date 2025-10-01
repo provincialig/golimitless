@@ -1,14 +1,14 @@
-package supermap_test
+package mapx_test
 
 import (
 	"sync"
 	"testing"
 
-	"github.com/provincialig/golimitless/supermap"
+	"github.com/provincialig/golimitless/mapx"
 )
 
 func Test_Size(t *testing.T) {
-	m := supermap.New[int, int]()
+	m := mapx.New[int, int]()
 	m.Set(1, 2)
 	m.Set(2, 2)
 	m.Set(1, 3)
@@ -19,7 +19,7 @@ func Test_Size(t *testing.T) {
 }
 
 func Test_Has(t *testing.T) {
-	m := supermap.New[int, int]()
+	m := mapx.New[int, int]()
 	m.Set(1, 1)
 	if !m.Has(1) {
 		t.Fatal("Map must be have 1")
@@ -30,7 +30,7 @@ func Test_Has(t *testing.T) {
 }
 
 func Test_Get(t *testing.T) {
-	m := supermap.New[string, int]()
+	m := mapx.New[string, int]()
 	m.Set("a", 10)
 	val, ok := m.Get("a")
 	if !ok || val != 10 {
@@ -43,7 +43,7 @@ func Test_Get(t *testing.T) {
 }
 
 func Test_Delete(t *testing.T) {
-	m := supermap.New[int, string]()
+	m := mapx.New[int, string]()
 	m.Set(1, "x")
 	m.Delete(1)
 	if m.Has(1) {
@@ -55,7 +55,7 @@ func Test_Delete(t *testing.T) {
 }
 
 func Test_Clear(t *testing.T) {
-	m := supermap.New[int, int]()
+	m := mapx.New[int, int]()
 	m.Set(1, 1)
 	m.Set(2, 2)
 	m.Clear()
@@ -65,7 +65,7 @@ func Test_Clear(t *testing.T) {
 }
 
 func Test_Keys(t *testing.T) {
-	m := supermap.New[string, int]()
+	m := mapx.New[string, int]()
 	m.Set("a", 1)
 	m.Set("b", 2)
 	keys := m.Keys()
@@ -75,7 +75,7 @@ func Test_Keys(t *testing.T) {
 }
 
 func Test_Values(t *testing.T) {
-	m := supermap.New[int, string]()
+	m := mapx.New[int, string]()
 	m.Set(1, "a")
 	m.Set(2, "b")
 	values := m.Values()
@@ -85,7 +85,7 @@ func Test_Values(t *testing.T) {
 }
 
 func Test_ToSlice(t *testing.T) {
-	m := supermap.New[int, string]()
+	m := mapx.New[int, string]()
 	m.Set(1, "a")
 	m.Set(2, "b")
 	slice := m.ToSlice()
@@ -95,7 +95,7 @@ func Test_ToSlice(t *testing.T) {
 }
 
 func Test_Range(t *testing.T) {
-	m := supermap.New[int, int]()
+	m := mapx.New[int, int]()
 	m.Set(1, 10)
 	m.Set(2, 20)
 	sum := 0
@@ -109,7 +109,7 @@ func Test_Range(t *testing.T) {
 }
 
 func Test_ConcurrentSetSameKey(t *testing.T) {
-	m := supermap.New[int, int]()
+	m := mapx.New[int, int]()
 
 	const goroutines = 1000
 	var wg sync.WaitGroup
@@ -136,7 +136,7 @@ func Test_ConcurrentSetSameKey(t *testing.T) {
 }
 
 func Test_OverwriteAfterConcurrentSets(t *testing.T) {
-	m := supermap.New[int, int]()
+	m := mapx.New[int, int]()
 
 	const goroutines = 200
 	var wg sync.WaitGroup
