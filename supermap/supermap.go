@@ -39,10 +39,11 @@ func (sm *mySuperMap[T, K]) Get(key T) (K, bool) {
 }
 
 func (sm *mySuperMap[T, K]) Set(key T, value K) {
-	if _, ok := sm.m.Load(key); !ok {
-		sm.m.Store(key, value)
+	if _, loaded := sm.m.LoadOrStore(key, value); !loaded {
 		atomic.AddInt64(&sm.count, 1)
+		return
 	}
+	sm.m.Store(key, value)
 }
 
 func (sm *mySuperMap[T, K]) Has(key T) bool {

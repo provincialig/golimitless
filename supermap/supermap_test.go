@@ -1,6 +1,7 @@
 package supermap_test
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/provincialig/golimitless/supermap"
@@ -105,6 +106,62 @@ func TestMap(t *testing.T) {
 		})
 		if sum != 30 {
 			t.Fatalf("expected sum 30, got %d", sum)
+		}
+	})
+
+	t.Run("ConcurrentSetSameKey", func(t *testing.T) {
+		m := supermap.New[int, int]()
+
+		const goroutines = 1000
+		var wg sync.WaitGroup
+		wg.Add(goroutines)
+		for i := range goroutines {
+			go func(v int) {
+				defer wg.Done()
+				m.Set(1, v)
+			}(i)
+		}
+		wg.Wait()
+
+		if m.Size() != 1 {
+			t.Fatalf("size should be 1 after concurrent sets on same key, got %d", m.Size())
+		}
+
+		val, ok := m.Get(1)
+		if !ok {
+			t.Fatal("key 1 should exist after concurrent sets")
+		}
+		if val < 0 || val >= goroutines {
+			t.Fatalf("value should be one of the written values, got %d", val)
+		}
+	})
+
+	t.Run("OverwriteAfterConcurrentSets", func(t *testing.T) {
+		m := supermap.New[int, int]()
+
+		const goroutines = 200
+		var wg sync.WaitGroup
+		wg.Add(goroutines)
+		for i := range goroutines {
+			go func(v int) {
+				defer wg.Done()
+				m.Set(1, v)
+			}(i)
+		}
+		wg.Wait()
+
+		// Deterministic final overwrite
+		m.Set(1, 999)
+
+		val, ok := m.Get(1)
+		if !ok {
+			t.Fatal("key 1 should exist")
+		}
+		if val != 999 {
+			t.Fatalf("expected final value 999, got %d", val)
+		}
+		if m.Size() != 1 {
+			t.Fatalf("size should remain 1, got %d", m.Size())
 		}
 	})
 }
