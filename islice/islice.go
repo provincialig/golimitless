@@ -2,8 +2,7 @@ package islice
 
 import (
 	"slices"
-
-	"github.com/provincialig/golimitless/mapx"
+	"sync"
 )
 
 type ISlice[T comparable, K comparable] interface {
@@ -17,49 +16,74 @@ type ISlice[T comparable, K comparable] interface {
 }
 
 type myIndexedSlice[T comparable, K comparable] struct {
-	m mapx.MapX[T, *[]K]
+	m   map[T][]K
+	mut *sync.Mutex
 }
 
 func (is *myIndexedSlice[T, K]) Get(key T) ([]K, bool) {
-	v, ok := is.m.Get(key)
-	if !ok || v == nil {
-		return nil, false
-	}
-	return *v, true
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	v, ok := is.m[key]
+	return v, ok
 }
 
 func (is *myIndexedSlice[T, K]) Has(key T) bool {
-	return is.m.Has(key)
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	_, ok := is.m[key]
+	return ok
 }
 
 func (is *myIndexedSlice[T, K]) Delete(key T) {
-	is.m.Delete(key)
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	delete(is.m, key)
 }
 
 func (is *myIndexedSlice[T, K]) Append(key T, value K) {
-	v, _ := is.m.LoadOrStore(key, &[]K{})
-	*v = append(*v, value)
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	_, ok := is.m[key]
+	if !ok {
+		is.m[key] = []K{}
+	}
+
+	is.m[key] = append(is.m[key], value)
 }
 
 func (is *myIndexedSlice[T, K]) Contains(key T, value K) bool {
-	v, ok := is.m.Get(key)
-	return ok && slices.Contains(*v, value)
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	v, ok := is.m[key]
+	return ok && slices.Contains(v, value)
 }
 
 func (is *myIndexedSlice[T, K]) Remove(key T, index int) {
-	v, ok := is.m.Get(key)
-	if ok && v != nil && index >= 0 && index < len(*v) {
-		*v = append((*v)[:index], (*v)[index+1:]...)
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	_, ok := is.m[key]
+	if ok && index >= 0 && index < len(is.m[key]) {
+		is.m[key] = slices.Delete(is.m[key], index, index+1)
 	}
 }
 
 func (is *myIndexedSlice[T, K]) IsEmpty(key T) bool {
-	v, ok := is.m.Get(key)
-	return ok && len(*v) == 0
+	is.mut.Lock()
+	defer is.mut.Unlock()
+
+	v, ok := is.m[key]
+	return ok && len(v) == 0
 }
 
 func New[T comparable, K comparable]() ISlice[T, K] {
 	return &myIndexedSlice[T, K]{
-		m: mapx.New[T, *[]K](),
+		m:   map[T][]K{},
+		mut: &sync.Mutex{},
 	}
 }
