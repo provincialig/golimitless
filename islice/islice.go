@@ -22,7 +22,10 @@ type myIndexedSlice[T comparable, K comparable] struct {
 
 func (is *myIndexedSlice[T, K]) Get(key T) ([]K, bool) {
 	v, ok := is.m.Get(key)
-	return *v, ok
+	if !ok || v == nil {
+		return nil, false
+	}
+	return *v, true
 }
 
 func (is *myIndexedSlice[T, K]) Has(key T) bool {
@@ -34,12 +37,12 @@ func (is *myIndexedSlice[T, K]) Delete(key T) {
 }
 
 func (is *myIndexedSlice[T, K]) Append(key T, value K) {
-	if !is.m.Has(key) {
-		is.m.Set(key, &[]K{})
+	if v, ok := is.m.Get(key); ok && v != nil {
+		*v = append(*v, value)
+		return
 	}
 
-	v, _ := is.m.Get(key)
-	*v = append(*v, value)
+	is.m.Set(key, &[]K{value})
 }
 
 func (is *myIndexedSlice[T, K]) Contains(key T, value K) bool {
@@ -49,7 +52,7 @@ func (is *myIndexedSlice[T, K]) Contains(key T, value K) bool {
 
 func (is *myIndexedSlice[T, K]) Remove(key T, index int) {
 	v, ok := is.m.Get(key)
-	if ok {
+	if ok && v != nil && index >= 0 && index < len(*v) {
 		*v = append((*v)[:index], (*v)[index+1:]...)
 	}
 }
