@@ -37,12 +37,8 @@ func (is *myIndexedSlice[T, K]) Delete(key T) {
 }
 
 func (is *myIndexedSlice[T, K]) Append(key T, value K) {
-	if v, ok := is.m.Get(key); ok && v != nil {
-		*v = append(*v, value)
-		return
-	}
-
-	is.m.Set(key, &[]K{value})
+	v, _ := is.m.LoadOrStore(key, &[]K{})
+	*v = append(*v, value)
 }
 
 func (is *myIndexedSlice[T, K]) Contains(key T, value K) bool {

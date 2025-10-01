@@ -13,6 +13,7 @@ type MapXItem[T any, K any] struct {
 type MapX[T comparable, K any] interface {
 	Get(key T) (K, bool)
 	Set(key T, value K)
+	LoadOrStore(key T, value K) (K, bool)
 	Has(key T) bool
 	Delete(key T)
 	Clear()
@@ -44,6 +45,16 @@ func (mx *myMapX[T, K]) Set(key T, value K) {
 		return
 	}
 	mx.m.Store(key, value)
+}
+
+func (mx *myMapX[T, K]) LoadOrStore(key T, value K) (K, bool) {
+	actual, loaded := mx.m.LoadOrStore(key, value)
+	if !loaded {
+		atomic.AddInt64(&mx.count, 1)
+		return value, false
+	}
+
+	return actual.(K), true
 }
 
 func (mx *myMapX[T, K]) Has(key T) bool {
