@@ -1,14 +1,15 @@
-package ds_test
+package doublemap_test
 
 import (
 	"log"
-	"provincialig/golimitless/ds"
 	"testing"
+
+	"github.com/provincialig/golimitless/doublemap"
 )
 
 func TestDoubleMap(t *testing.T) {
 	t.Run("Size", func(t *testing.T) {
-		dm := ds.NewDoubleMap[int, int, string]()
+		dm := doublemap.New[int, int, string]()
 
 		dm.Set(1, 1, "a")
 		dm.Set(1, 2, "b")
@@ -28,7 +29,7 @@ func TestDoubleMap(t *testing.T) {
 	})
 
 	t.Run("Has", func(t *testing.T) {
-		dm := ds.NewDoubleMap[int, int, string]()
+		dm := doublemap.New[int, int, string]()
 
 		dm.Set(1, 1, "a")
 		dm.Set(1, 2, "b")
@@ -52,7 +53,7 @@ func TestDoubleMap(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		dm := ds.NewDoubleMap[string, string, int]()
+		dm := doublemap.New[string, string, int]()
 
 		dm.Set("a", "b", 1)
 
@@ -69,7 +70,7 @@ func TestDoubleMap(t *testing.T) {
 	})
 
 	t.Run("Delete & RootKeys & ChildKeys", func(t *testing.T) {
-		dm := ds.NewDoubleMap[int, int, string]()
+		dm := doublemap.New[int, int, string]()
 		dm.Set(1, 1, "a")
 		dm.Set(1, 2, "b")
 		dm.Set(2, 1, "c")
@@ -96,7 +97,7 @@ func TestDoubleMap(t *testing.T) {
 	})
 
 	t.Run("ClearRoot & ClearChild", func(t *testing.T) {
-		dm := ds.NewDoubleMap[int, int, int]()
+		dm := doublemap.New[int, int, int]()
 		dm.Set(1, 1, 1)
 		dm.Set(1, 2, 2)
 		dm.Set(2, 1, 3)

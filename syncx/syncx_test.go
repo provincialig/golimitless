@@ -1,9 +1,10 @@
-package utils_test
+package syncx_test
 
 import (
-	"provincialig/golimitless/utils"
 	"sync"
 	"testing"
+
+	"github.com/provincialig/golimitless/syncx"
 )
 
 func TestSync(t *testing.T) {
@@ -17,7 +18,7 @@ func TestSync(t *testing.T) {
 		for range goroutines {
 			go func() {
 				defer wg.Done()
-				_, err := utils.MutexBlockWithValue(&mut, func() (int, error) {
+				_, err := syncx.MutexBlockWithValue(&mut, func() (int, error) {
 					tmp := counter
 					tmp++
 					counter = tmp
@@ -44,7 +45,7 @@ func TestSync(t *testing.T) {
 		for range goroutines {
 			go func() {
 				defer wg.Done()
-				err := utils.MutexBlock(&mut, func() error {
+				err := syncx.MutexBlock(&mut, func() error {
 					tmp := counter
 					tmp++
 					counter = tmp

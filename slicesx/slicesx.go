@@ -1,6 +1,6 @@
-package utils
+package slicesx
 
-func SliceFilter[T any](silce []T, fn func(el T) bool) []T {
+func Filter[T any](silce []T, fn func(el T) bool) []T {
 	result := []T{}
 
 	for _, el := range silce {
@@ -12,7 +12,7 @@ func SliceFilter[T any](silce []T, fn func(el T) bool) []T {
 	return result
 }
 
-func SliceMap[T any, K any](slice []T, fn func(el T) K) []K {
+func Map[T any, K any](slice []T, fn func(el T) K) []K {
 	result := []K{}
 
 	for _, el := range slice {
@@ -22,7 +22,7 @@ func SliceMap[T any, K any](slice []T, fn func(el T) K) []K {
 	return result
 }
 
-func SliceReduce[T any, K any](slice []T, initial K, fn func(acc K, el T) K) K {
+func Reduce[T any, K any](slice []T, initial K, fn func(acc K, el T) K) K {
 	acc := initial
 
 	for _, el := range slice {
@@ -32,7 +32,7 @@ func SliceReduce[T any, K any](slice []T, initial K, fn func(acc K, el T) K) K {
 	return acc
 }
 
-func SliceForEach[T any](slice []T, fn func(el T) bool) {
+func ForEach[T any](slice []T, fn func(el T) bool) {
 	for _, el := range slice {
 		if !fn(el) {
 			return

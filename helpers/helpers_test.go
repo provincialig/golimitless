@@ -1,18 +1,19 @@
-package utils_test
+package helpers_test
 
 import (
 	"context"
 	"errors"
-	"provincialig/golimitless/utils"
 	"testing"
 	"time"
+
+	"github.com/provincialig/golimitless/helpers"
 )
 
 func TestUtils(t *testing.T) {
 	t.Run("MaxRetrySuccess", func(t *testing.T) {
 		counter := 0
 
-		err := utils.ContinousRetry(context.Background(), 0, 0, func() error {
+		err := helpers.ContinousRetry(context.Background(), 0, 0, func() error {
 			if counter == 5 {
 				return nil
 			}
@@ -31,7 +32,7 @@ func TestUtils(t *testing.T) {
 	})
 
 	t.Run("MaxRetryFail", func(t *testing.T) {
-		err := utils.ContinousRetry(context.Background(), 0, 10, func() error {
+		err := helpers.ContinousRetry(context.Background(), 0, 10, func() error {
 			return errors.New("")
 		})
 		if err == nil {
@@ -50,7 +51,7 @@ func TestUtils(t *testing.T) {
 
 		calls := 0
 
-		err := utils.ContinousRetry(ctx, 10*time.Millisecond, 0, func() error {
+		err := helpers.ContinousRetry(ctx, 10*time.Millisecond, 0, func() error {
 			calls++
 			return errors.New("fail")
 		})
@@ -75,7 +76,7 @@ func TestUtils(t *testing.T) {
 		close(ch1)
 		close(ch2)
 
-		out := utils.JoinChannels([]<-chan int{ch1, ch2})
+		out := helpers.JoinChannels([]<-chan int{ch1, ch2})
 
 		count := 0
 		for range out {

@@ -1,14 +1,15 @@
-package ds_test
+package expireset_test
 
 import (
-	"provincialig/golimitless/ds"
 	"testing"
 	"time"
+
+	"github.com/provincialig/golimitless/expireset"
 )
 
 func TestExpireSet(t *testing.T) {
 	t.Run("Expire", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(10, 100*time.Millisecond)
 
 		time.Sleep(200 * time.Millisecond)
@@ -19,7 +20,7 @@ func TestExpireSet(t *testing.T) {
 	})
 
 	t.Run("NotExpire", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(10, 2*time.Second)
 
 		if !es.Has(10) {
@@ -28,7 +29,7 @@ func TestExpireSet(t *testing.T) {
 	})
 
 	t.Run("Empty", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(1, 100*time.Millisecond)
 		es.Add(2, 200*time.Millisecond)
 
@@ -40,7 +41,7 @@ func TestExpireSet(t *testing.T) {
 	})
 
 	t.Run("NotEmpty", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(1, 10*time.Second)
 		es.Add(2, 20*time.Second)
 
@@ -50,7 +51,7 @@ func TestExpireSet(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(42, 2*time.Second)
 		if !es.Has(42) {
 			t.Fatal("should have 42 before delete")
@@ -62,7 +63,7 @@ func TestExpireSet(t *testing.T) {
 	})
 
 	t.Run("ExpireTime", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(7, 500*time.Millisecond)
 		et, ok := es.ExpireTime(7)
 		if !ok {
@@ -74,7 +75,7 @@ func TestExpireSet(t *testing.T) {
 	})
 
 	t.Run("Iterator & Clear", func(t *testing.T) {
-		es := ds.NewExpireSet[int]()
+		es := expireset.New[int]()
 		es.Add(1, 5*time.Second)
 		es.Add(2, 5*time.Second)
 		es.Add(3, 5*time.Second)

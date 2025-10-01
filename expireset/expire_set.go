@@ -1,4 +1,4 @@
-package ds
+package expireset
 
 import (
 	"sync"
@@ -93,7 +93,7 @@ func (es *myExpireSet[T]) IsEmpty() bool {
 	return !found
 }
 
-func NewExpireSet[T comparable]() ExpireSet[T] {
+func New[T comparable]() ExpireSet[T] {
 	return &myExpireSet[T]{
 		m:   map[T]time.Time{},
 		mut: &sync.Mutex{},

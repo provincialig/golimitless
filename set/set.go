@@ -1,4 +1,6 @@
-package ds
+package set
+
+import "github.com/provincialig/golimitless/supermap"
 
 type Set[T comparable] interface {
 	Add(values ...T)
@@ -13,7 +15,7 @@ type Set[T comparable] interface {
 }
 
 type mySet[T comparable] struct {
-	s Map[T, struct{}]
+	s supermap.SuperMap[T, struct{}]
 }
 
 func (s *mySet[T]) Add(values ...T) {
@@ -39,7 +41,7 @@ func (s *mySet[T]) Range(fn func(value T) bool) {
 }
 
 func (ss *mySet[T]) Union(s Set[T]) Set[T] {
-	res := NewSet[T]()
+	res := New[T]()
 
 	ss.Range(func(value T) bool {
 		res.Add(value)
@@ -54,7 +56,7 @@ func (ss *mySet[T]) Union(s Set[T]) Set[T] {
 }
 
 func (ss *mySet[T]) Intersect(s Set[T]) Set[T] {
-	res := NewSet[T]()
+	res := New[T]()
 
 	smaller, larger := Set[T](ss), s
 	if s.Size() < ss.Size() {
@@ -72,7 +74,7 @@ func (ss *mySet[T]) Intersect(s Set[T]) Set[T] {
 }
 
 func (ss *mySet[T]) Difference(s Set[T]) Set[T] {
-	res := NewSet[T]()
+	res := New[T]()
 
 	ss.Range(func(value T) bool {
 		if !s.Has(value) {
@@ -99,8 +101,8 @@ func (s *mySet[T]) Size() int {
 	return s.s.Size()
 }
 
-func NewSet[T comparable]() Set[T] {
+func New[T comparable]() Set[T] {
 	return &mySet[T]{
-		s: NewMap[T, struct{}](),
+		s: supermap.New[T, struct{}](),
 	}
 }

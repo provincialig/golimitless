@@ -1,13 +1,14 @@
-package ds_test
+package set_test
 
 import (
-	"provincialig/golimitless/ds"
 	"testing"
+
+	"github.com/provincialig/golimitless/set"
 )
 
 func TestSet(t *testing.T) {
 	t.Run("Size", func(t *testing.T) {
-		set := ds.NewSet[int]()
+		set := set.New[int]()
 		set.Add(1, 2, 3, 4)
 		set.Remove(2, 1, 5)
 		set.Add(6)
@@ -19,10 +20,10 @@ func TestSet(t *testing.T) {
 	})
 
 	t.Run("Union", func(t *testing.T) {
-		a := ds.NewSet[int]()
+		a := set.New[int]()
 		a.Add(1, 2, 3, 4)
 
-		b := ds.NewSet[int]()
+		b := set.New[int]()
 		b.Add(2, 3, 4, 5)
 
 		sum := 0
@@ -39,10 +40,10 @@ func TestSet(t *testing.T) {
 	})
 
 	t.Run("Intersection", func(t *testing.T) {
-		a := ds.NewSet[int]()
+		a := set.New[int]()
 		a.Add(1, 2, 3, 4)
 
-		b := ds.NewSet[int]()
+		b := set.New[int]()
 		b.Add(2, 3, 4, 5)
 
 		sum := 0
@@ -59,10 +60,10 @@ func TestSet(t *testing.T) {
 	})
 
 	t.Run("Difference", func(t *testing.T) {
-		a := ds.NewSet[int]()
+		a := set.New[int]()
 		a.Add(1, 2, 3, 4)
 
-		b := ds.NewSet[int]()
+		b := set.New[int]()
 		b.Add(2, 3, 4, 5)
 
 		sum := 0
@@ -79,7 +80,7 @@ func TestSet(t *testing.T) {
 	})
 
 	t.Run("Has & Remove", func(t *testing.T) {
-		set := ds.NewSet[int]()
+		set := set.New[int]()
 		set.Add(1, 2)
 		if !set.Has(1) || !set.Has(2) {
 			t.Fatal("set should contain 1 and 2")
@@ -91,7 +92,7 @@ func TestSet(t *testing.T) {
 	})
 
 	t.Run("Range", func(t *testing.T) {
-		set := ds.NewSet[int]()
+		set := set.New[int]()
 		set.Add(1, 2, 3)
 		sum := 0
 		set.Range(func(value int) bool {
@@ -104,7 +105,7 @@ func TestSet(t *testing.T) {
 	})
 
 	t.Run("ToSlice", func(t *testing.T) {
-		set := ds.NewSet[string]()
+		set := set.New[string]()
 		set.Add("a", "b")
 		slice := set.ToSlice()
 		if len(slice) != 2 {

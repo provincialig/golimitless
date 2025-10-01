@@ -1,14 +1,15 @@
-package ds_test
+package islice_test
 
 import (
-	"provincialig/golimitless/ds"
 	"strings"
 	"testing"
+
+	"github.com/provincialig/golimitless/islice"
 )
 
 func TestIndexedSlice(t *testing.T) {
 	t.Run("Get", func(t *testing.T) {
-		s := ds.NewIndexedSlice[int, string]()
+		s := islice.New[int, string]()
 
 		s.Append(1, "ciao")
 		s.Append(1, " ")
@@ -26,7 +27,7 @@ func TestIndexedSlice(t *testing.T) {
 	})
 
 	t.Run("Has", func(t *testing.T) {
-		s := ds.NewIndexedSlice[int, int]()
+		s := islice.New[int, int]()
 
 		s.Append(1, 1)
 		s.Append(2, 1)
@@ -46,7 +47,7 @@ func TestIndexedSlice(t *testing.T) {
 	})
 
 	t.Run("Remove", func(t *testing.T) {
-		s := ds.NewIndexedSlice[int, int]()
+		s := islice.New[int, int]()
 		s.Append(1, 1)
 		s.Append(1, 2)
 		s.Append(1, 3)
@@ -66,7 +67,7 @@ func TestIndexedSlice(t *testing.T) {
 	})
 
 	t.Run("Contains", func(t *testing.T) {
-		s := ds.NewIndexedSlice[int, int]()
+		s := islice.New[int, int]()
 		s.Append(1, 1)
 		s.Append(1, 2)
 		s.Append(1, 3)
@@ -81,7 +82,7 @@ func TestIndexedSlice(t *testing.T) {
 	})
 
 	t.Run("IsEmpty", func(t *testing.T) {
-		s := ds.NewIndexedSlice[int, int]()
+		s := islice.New[int, int]()
 		if s.IsEmpty(1) {
 			t.Fatal("IsEmpty should be false for non-existent key (len undefined)")
 		}
@@ -96,7 +97,7 @@ func TestIndexedSlice(t *testing.T) {
 	})
 
 	t.Run("Delete key", func(t *testing.T) {
-		s := ds.NewIndexedSlice[int, int]()
+		s := islice.New[int, int]()
 		s.Append(1, 1)
 		s.Append(1, 2)
 		s.Append(2, 3)

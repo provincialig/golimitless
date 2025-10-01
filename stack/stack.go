@@ -1,4 +1,4 @@
-package ds
+package stack
 
 import "sync"
 
@@ -66,7 +66,7 @@ func (s *myStack[T]) IsEmpty() bool {
 	return s.Size() == 0
 }
 
-func NewStack[T any]() Stack[T] {
+func New[T any]() Stack[T] {
 	return &myStack[T]{
 		s:   []T{},
 		mut: sync.Mutex{},

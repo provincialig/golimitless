@@ -1,4 +1,6 @@
-package ds
+package doublemap
+
+import "github.com/provincialig/golimitless/supermap"
 
 type DoubleMap[T comparable, K comparable, V any] interface {
 	Set(key1 T, key2 K, value V)
@@ -14,12 +16,12 @@ type DoubleMap[T comparable, K comparable, V any] interface {
 }
 
 type myDoubleMap[T comparable, K comparable, V any] struct {
-	m Map[T, Map[K, V]]
+	m supermap.SuperMap[T, supermap.SuperMap[K, V]]
 }
 
 func (dm *myDoubleMap[T, K, V]) Set(key1 T, key2 K, value V) {
 	if !dm.m.Has(key1) {
-		dm.m.Set(key1, NewMap[K, V]())
+		dm.m.Set(key1, supermap.New[K, V]())
 	}
 
 	child, _ := dm.m.Get(key1)
@@ -89,8 +91,8 @@ func (dm *myDoubleMap[T, K, V]) ClearChild(key T) {
 	}
 }
 
-func NewDoubleMap[T comparable, K comparable, V any]() DoubleMap[T, K, V] {
+func New[T comparable, K comparable, V any]() DoubleMap[T, K, V] {
 	return &myDoubleMap[T, K, V]{
-		m: NewMap[T, Map[K, V]](),
+		m: supermap.New[T, supermap.SuperMap[K, V]](),
 	}
 }

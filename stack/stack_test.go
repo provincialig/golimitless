@@ -1,13 +1,14 @@
-package ds_test
+package stack_test
 
 import (
-	"provincialig/golimitless/ds"
 	"testing"
+
+	"github.com/provincialig/golimitless/stack"
 )
 
 func TestStack(t *testing.T) {
 	t.Run("Push", func(t *testing.T) {
-		s := ds.NewStack[int]()
+		s := stack.New[int]()
 		s.Push(10)
 		s.Push(20)
 
@@ -22,7 +23,7 @@ func TestStack(t *testing.T) {
 	})
 
 	t.Run("Pop", func(t *testing.T) {
-		s := ds.NewStack[int]()
+		s := stack.New[int]()
 		s.Push(1)
 		s.Push(2)
 		s.Push(3)
@@ -66,7 +67,7 @@ func TestStack(t *testing.T) {
 	})
 
 	t.Run("Peek", func(t *testing.T) {
-		s := ds.NewStack[int]()
+		s := stack.New[int]()
 		s.Push(10)
 		s.Push(20)
 
@@ -83,7 +84,7 @@ func TestStack(t *testing.T) {
 	})
 
 	t.Run("Clear", func(t *testing.T) {
-		s := ds.NewStack[int]()
+		s := stack.New[int]()
 		s.Push(1)
 		s.Push(2)
 		s.Push(3)
@@ -102,7 +103,7 @@ func TestStack(t *testing.T) {
 	})
 
 	t.Run("Iterate", func(t *testing.T) {
-		s := ds.NewStack[int]()
+		s := stack.New[int]()
 		s.Push(1)
 		s.Push(2)
 		s.Push(3)

@@ -1,8 +1,12 @@
-package ds
+package islice
 
-import "slices"
+import (
+	"slices"
 
-type IndexedSlice[T comparable, K comparable] interface {
+	"github.com/provincialig/golimitless/supermap"
+)
+
+type ISlice[T comparable, K comparable] interface {
 	Get(key T) ([]K, bool)
 	Has(key T) bool
 	Delete(key T)
@@ -13,7 +17,7 @@ type IndexedSlice[T comparable, K comparable] interface {
 }
 
 type myIndexedSlice[T comparable, K comparable] struct {
-	m Map[T, *[]K]
+	m supermap.SuperMap[T, *[]K]
 }
 
 func (is *myIndexedSlice[T, K]) Get(key T) ([]K, bool) {
@@ -55,8 +59,8 @@ func (is *myIndexedSlice[T, K]) IsEmpty(key T) bool {
 	return ok && len(*v) == 0
 }
 
-func NewIndexedSlice[T comparable, K comparable]() IndexedSlice[T, K] {
+func New[T comparable, K comparable]() ISlice[T, K] {
 	return &myIndexedSlice[T, K]{
-		m: NewMap[T, *[]K](),
+		m: supermap.New[T, *[]K](),
 	}
 }
