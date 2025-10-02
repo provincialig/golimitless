@@ -2,7 +2,7 @@ package queue
 
 import "sync"
 
-type Queue[T comparable] interface {
+type Queue[T any] interface {
 	Enqueue(el T)
 	Dequeue() (T, bool)
 	Front() (T, bool)
@@ -11,7 +11,7 @@ type Queue[T comparable] interface {
 	Size() int
 }
 
-type myQueue[T comparable] struct {
+type myQueue[T any] struct {
 	s   []T
 	mut *sync.Mutex
 }
@@ -71,7 +71,7 @@ func (q *myQueue[T]) IsEmpty() bool {
 	return len(q.s) == 0
 }
 
-func New[T comparable]() Queue[T] {
+func New[T any]() Queue[T] {
 	return &myQueue[T]{
 		s:   []T{},
 		mut: &sync.Mutex{},
