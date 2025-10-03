@@ -1,79 +1,102 @@
 package queue
 
-import "sync"
+import (
+	"sync"
+)
 
 type Queue[T any] interface {
 	Enqueue(el T)
-	Dequeue() (T, bool)
-	Front() (T, bool)
+	Dequeue() T
 	Clear()
 	IsEmpty() bool
 	Size() int
 }
 
-type myQueue[T any] struct {
-	s   []T
-	mut *sync.Mutex
+type node[T any] struct {
+	value T
+	next  *node[T]
 }
 
-func (q *myQueue[T]) Enqueue(el T) {
+type linkedListQueue[T any] struct {
+	mut  *sync.Mutex
+	cond *sync.Cond
+
+	head *node[T]
+	tail *node[T]
+
+	size int
+}
+
+func (q *linkedListQueue[T]) Enqueue(el T) {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	q.s = append(q.s, el)
-}
+	newVal := &node[T]{value: el}
 
-func (q *myQueue[T]) Dequeue() (T, bool) {
-	q.mut.Lock()
-	defer q.mut.Unlock()
-
-	if len(q.s) == 0 {
-		var zero T
-		return zero, false
+	if q.tail == nil {
+		q.head = newVal
+		q.tail = newVal
+	} else {
+		q.tail.next = newVal
+		q.tail = newVal
 	}
 
-	el := q.s[0]
-	q.s = q.s[1:]
+	q.size++
 
-	return el, true
+	q.cond.Signal()
 }
 
-func (q *myQueue[T]) Front() (T, bool) {
+func (q *linkedListQueue[T]) Dequeue() T {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	if len(q.s) == 0 {
-		var zero T
-		return zero, false
+	for q.size == 0 {
+		q.cond.Wait()
 	}
 
-	return q.s[0], true
+	el := q.head
+
+	if el.next != nil {
+		q.head = el.next
+	} else {
+		q.head = nil
+		q.tail = nil
+	}
+
+	el.next = nil
+
+	q.size--
+
+	return el.value
 }
 
-func (q *myQueue[T]) Clear() {
+func (q *linkedListQueue[T]) Clear() {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	q.s = []T{}
+	q.size = 0
+	q.head = nil
+	q.tail = nil
 }
 
-func (q *myQueue[T]) Size() int {
+func (q *linkedListQueue[T]) Size() int {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	return len(q.s)
+	return q.size
 }
 
-func (q *myQueue[T]) IsEmpty() bool {
+func (q *linkedListQueue[T]) IsEmpty() bool {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	return len(q.s) == 0
+	return q.size == 0
 }
 
 func New[T any]() Queue[T] {
-	return &myQueue[T]{
-		s:   []T{},
-		mut: &sync.Mutex{},
+	var mut sync.Mutex
+	return &linkedListQueue[T]{
+		mut:  &mut,
+		cond: sync.NewCond(&mut),
 	}
 }
