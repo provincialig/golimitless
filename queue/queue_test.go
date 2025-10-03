@@ -2,6 +2,7 @@ package queue_test
 
 import (
 	"context"
+	"sync"
 	"testing"
 
 	"github.com/provincialig/golimitless/queue"
@@ -78,5 +79,107 @@ func Test_QueueTryDequeue(t *testing.T) {
 	val, ok = q.TryDequeue()
 	if ok {
 		t.Errorf("expected ok=false after all elements dequeued, got ok=true with value %v", val)
+	}
+}
+
+func Test_QueueDequeue_BlockingAndCancel(t *testing.T) {
+	q := queue.New[int]()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	done := make(chan struct{})
+	go func() {
+		val, err := q.Dequeue(ctx)
+		if err != queue.ErrCanceled {
+			t.Errorf("expected ErrCanceled, got %v", err)
+		}
+		if val != 0 {
+			t.Errorf("expected zero value, got %v", val)
+		}
+		close(done)
+	}()
+
+	// Cancel after short delay
+	cancel()
+	<-done
+}
+
+func Test_QueueDequeue_BlockingAndTimeout(t *testing.T) {
+	q := queue.New[int]()
+	ctx, cancel := context.WithTimeout(context.Background(), 0)
+	defer cancel()
+
+	val, err := q.Dequeue(ctx)
+	if err != queue.ErrTimeout {
+		t.Errorf("expected ErrTimeout, got %v", err)
+	}
+	if val != 0 {
+		t.Errorf("expected zero value, got %v", val)
+	}
+}
+
+func Test_QueueDequeue_ConcurrentEnqueueDequeue(t *testing.T) {
+	q := queue.New[int]()
+	const n = 100
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	// Enqueue in goroutine
+	go func() {
+		for i := range n {
+			q.Enqueue(i)
+		}
+		wg.Done()
+	}()
+
+	// Dequeue in goroutine
+	go func() {
+		for i := range n {
+			val, err := q.Dequeue(context.Background())
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if val != i {
+				t.Errorf("expected %d, got %d", i, val)
+			}
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+	if !q.IsEmpty() {
+		t.Errorf("expected queue to be empty after concurrent ops")
+	}
+}
+
+func Test_QueueTryDequeue_Concurrent(t *testing.T) {
+	q := queue.New[int]()
+	const n = 50
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		for i := range n {
+			q.Enqueue(i)
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		count := 0
+		for count < n {
+			val, ok := q.TryDequeue()
+			if ok {
+				count++
+				if val < 0 || val >= n {
+					t.Errorf("dequeued value out of range: %d", val)
+				}
+			}
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+	if !q.IsEmpty() {
+		t.Errorf("expected queue to be empty after concurrent TryDequeue")
 	}
 }
