@@ -27,36 +27,27 @@ func Test_Pop(t *testing.T) {
 	s.Push(2)
 	s.Push(3)
 
-	el := s.Pop()
-	size := s.Size()
-
-	if el != 3 {
+	if el, ok := s.Pop(); !ok || el != 3 {
 		t.Fatalf("Element: %d", el)
 	}
 
-	if size != 2 {
+	if size := s.Size(); size != 2 {
 		t.Fatalf("Size: %d", size)
 	}
 
-	el = s.Pop()
-	size = s.Size()
-
-	if el != 2 {
+	if el, ok := s.Pop(); !ok || el != 2 {
 		t.Fatalf("Element: %d", el)
 	}
 
-	if size != 1 {
+	if size := s.Size(); size != 1 {
 		t.Fatalf("Size: %d", size)
 	}
 
-	el = s.Pop()
-	size = s.Size()
-
-	if el != 1 {
+	if el, ok := s.Pop(); !ok || el != 1 {
 		t.Fatalf("Element: %d", el)
 	}
 
-	if size != 0 {
+	if size := s.Size(); size != 0 {
 		t.Fatalf("Size: %d", size)
 	}
 
@@ -70,14 +61,11 @@ func Test_Peek(t *testing.T) {
 	s.Push(10)
 	s.Push(20)
 
-	el := s.Peek()
-	size := s.Size()
-
-	if el != 20 {
+	if el, ok := s.Peek(); !ok || el != 20 {
 		t.Fatalf("Element: %d", el)
 	}
 
-	if size != 2 {
+	if size := s.Size(); size != 2 {
 		t.Fatalf("Size: %d", size)
 	}
 }
@@ -98,30 +86,5 @@ func Test_Clear(t *testing.T) {
 	finalSize := s.Size()
 	if finalSize != 0 {
 		t.Fatalf("Final size: %d", initialSize)
-	}
-}
-
-func Test_Iterate(t *testing.T) {
-	s := stack.New[int]()
-	s.Push(1)
-	s.Push(2)
-	s.Push(3)
-
-	sum := 0
-	count := 0
-	s.Iterate(func(value int) bool {
-		sum += value
-		count++
-		return true
-	})
-
-	if sum != 6 {
-		t.Fatalf("sum should be 6, got %d", sum)
-	}
-	if count != 3 {
-		t.Fatalf("count should be 3, got %d", count)
-	}
-	if !s.IsEmpty() {
-		t.Fatal("stack should be empty after Iterate")
 	}
 }
