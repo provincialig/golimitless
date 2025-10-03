@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
 )
 
 var (
@@ -33,7 +34,7 @@ type linkedListStack[T any] struct {
 
 	top *node[T]
 
-	size int
+	size int64
 }
 
 func (s *linkedListStack[T]) Push(value T) {
@@ -49,7 +50,7 @@ func (s *linkedListStack[T]) Push(value T) {
 		s.top = newVal
 	}
 
-	s.size++
+	atomic.AddInt64(&s.size, 1)
 }
 
 func (s *linkedListStack[T]) popUnsafe() (T, bool) {
@@ -62,7 +63,7 @@ func (s *linkedListStack[T]) popUnsafe() (T, bool) {
 	s.top = el.next
 	el.next = nil
 
-	s.size--
+	atomic.AddInt64(&s.size, -1)
 
 	return el.value, true
 }
@@ -181,20 +182,17 @@ func (s *linkedListStack[T]) Clear() {
 	defer s.mut.Unlock()
 
 	s.top = nil
-	s.size = 0
+	atomic.StoreInt64(&s.size, 0)
 
 	s.cond.Broadcast()
 }
 
 func (s *linkedListStack[T]) Size() int {
-	s.mut.Lock()
-	defer s.mut.Unlock()
-
-	return s.size
+	return int(atomic.LoadInt64(&s.size))
 }
 
 func (s *linkedListStack[T]) IsEmpty() bool {
-	return s.Size() == 0
+	return atomic.LoadInt64(&s.size) == 0
 }
 
 func New[T any]() Stack[T] {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
 )
 
 var (
@@ -32,7 +33,7 @@ type linkedListQueue[T any] struct {
 	head *node[T]
 	tail *node[T]
 
-	size int
+	size int64
 }
 
 func (q *linkedListQueue[T]) Enqueue(el T) {
@@ -49,7 +50,7 @@ func (q *linkedListQueue[T]) Enqueue(el T) {
 		q.tail = newVal
 	}
 
-	q.size++
+	atomic.AddInt64(&q.size, 1)
 
 	q.cond.Signal()
 }
@@ -71,7 +72,7 @@ func (q *linkedListQueue[T]) dequeueUnsafe() (T, bool) {
 
 	el.next = nil
 
-	q.size--
+	atomic.AddInt64(&q.size, -1)
 
 	return el.value, true
 }
@@ -130,7 +131,7 @@ func (q *linkedListQueue[T]) Clear() {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	q.size = 0
+	atomic.StoreInt64(&q.size, 0)
 	q.head = nil
 	q.tail = nil
 
@@ -138,14 +139,11 @@ func (q *linkedListQueue[T]) Clear() {
 }
 
 func (q *linkedListQueue[T]) Size() int {
-	q.mut.Lock()
-	defer q.mut.Unlock()
-
-	return q.size
+	return int(atomic.LoadInt64(&q.size))
 }
 
 func (q *linkedListQueue[T]) IsEmpty() bool {
-	return q.Size() == 0
+	return atomic.LoadInt64(&q.size) == 0
 }
 
 func New[T any]() Queue[T] {
