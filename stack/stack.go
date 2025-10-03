@@ -86,16 +86,18 @@ func (s *linkedListStack[T]) Pop(ctx context.Context) (T, error) {
 	s.mut.Lock()
 	defer s.mut.Unlock()
 
-	ctxDone := make(chan struct{})
+	stop := make(chan struct{})
+	defer close(stop)
 
 	go func() {
-		<-ctx.Done()
-
-		close(ctxDone)
-
-		s.mut.Lock()
-		s.cond.Broadcast()
-		s.mut.Unlock()
+		select {
+		case <-ctx.Done():
+			s.mut.Lock()
+			s.cond.Broadcast()
+			s.mut.Unlock()
+		case <-stop:
+			return
+		}
 	}()
 
 	for {
@@ -103,14 +105,12 @@ func (s *linkedListStack[T]) Pop(ctx context.Context) (T, error) {
 			return item, nil
 		}
 
-		select {
-		case <-ctxDone:
+		if err := ctx.Err(); err != nil {
 			var zero T
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			if errors.Is(err, context.DeadlineExceeded) {
 				return zero, ErrTimeout
 			}
 			return zero, ErrCanceled
-		default:
 		}
 
 		s.cond.Wait()
@@ -182,6 +182,8 @@ func (s *linkedListStack[T]) Clear() {
 
 	s.top = nil
 	s.size = 0
+
+	s.cond.Broadcast()
 }
 
 func (s *linkedListStack[T]) Size() int {

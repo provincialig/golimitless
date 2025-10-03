@@ -55,7 +55,7 @@ func (q *linkedListQueue[T]) Enqueue(el T) {
 }
 
 func (q *linkedListQueue[T]) dequeueUnsafe() (T, bool) {
-	for q.size == 0 {
+	if q.size == 0 {
 		var zero T
 		return zero, false
 	}
@@ -95,16 +95,18 @@ func (q *linkedListQueue[T]) Dequeue(ctx context.Context) (T, error) {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
-	ctxDone := make(chan struct{})
+	stop := make(chan struct{})
+	defer close(stop)
 
 	go func() {
-		<-ctx.Done()
-
-		close(ctxDone)
-
-		q.mut.Lock()
-		q.cond.Broadcast()
-		q.mut.Unlock()
+		select {
+		case <-ctx.Done():
+			q.mut.Lock()
+			q.cond.Broadcast()
+			q.mut.Unlock()
+		case <-stop:
+			return
+		}
 	}()
 
 	for {
@@ -112,14 +114,12 @@ func (q *linkedListQueue[T]) Dequeue(ctx context.Context) (T, error) {
 			return item, nil
 		}
 
-		select {
-		case <-ctxDone:
+		if err := ctx.Err(); err != nil {
 			var zero T
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			if errors.Is(err, context.DeadlineExceeded) {
 				return zero, ErrTimeout
 			}
 			return zero, ErrCanceled
-		default:
 		}
 
 		q.cond.Wait()
@@ -133,6 +133,8 @@ func (q *linkedListQueue[T]) Clear() {
 	q.size = 0
 	q.head = nil
 	q.tail = nil
+
+	q.cond.Broadcast()
 }
 
 func (q *linkedListQueue[T]) Size() int {
