@@ -145,10 +145,7 @@ func (q *linkedListQueue[T]) Size() int {
 }
 
 func (q *linkedListQueue[T]) IsEmpty() bool {
-	q.mut.Lock()
-	defer q.mut.Unlock()
-
-	return q.size == 0
+	return q.Size() == 0
 }
 
 func New[T any]() Queue[T] {
