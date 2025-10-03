@@ -7,9 +7,8 @@ import (
 )
 
 var (
-	ErrEmptyQueue = errors.New("queue is empty")
-	ErrTimeout    = errors.New("dequeue timeout")
-	ErrCanceled   = errors.New("dequeue canceled")
+	ErrTimeout  = errors.New("context timeout")
+	ErrCanceled = errors.New("context canceled")
 )
 
 type Queue[T any] interface {
@@ -82,7 +81,6 @@ func (q *linkedListQueue[T]) TryDequeue() (T, bool) {
 	defer q.mut.Unlock()
 
 	return q.dequeueUnsafe()
-
 }
 
 func (q *linkedListQueue[T]) Dequeue(ctx context.Context) (T, error) {
