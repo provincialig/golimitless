@@ -1,11 +1,22 @@
 package stack
 
-import "sync"
+import (
+	"context"
+	"errors"
+	"sync"
+)
+
+var (
+	ErrTimeout  = errors.New("context timeout")
+	ErrCanceled = errors.New("context canceled")
+)
 
 type Stack[T any] interface {
 	Push(value T)
-	Pop() (T, bool)
-	Peek() (T, bool)
+	TryPop() (T, bool)
+	Pop(ctx context.Context) (T, error)
+	TryPeek() (T, bool)
+	Peek(ctx context.Context) (T, error)
 	Clear()
 	IsEmpty() bool
 	Size() int
@@ -17,8 +28,11 @@ type node[T any] struct {
 }
 
 type linkedListStack[T any] struct {
-	mut  sync.Mutex
-	top  *node[T]
+	mut  *sync.Mutex
+	cond *sync.Cond
+
+	top *node[T]
+
 	size int
 }
 
@@ -38,10 +52,7 @@ func (s *linkedListStack[T]) Push(value T) {
 	s.size++
 }
 
-func (s *linkedListStack[T]) Pop() (T, bool) {
-	s.mut.Lock()
-	defer s.mut.Unlock()
-
+func (s *linkedListStack[T]) popUnsafe() (T, bool) {
 	if s.top == nil {
 		var zero T
 		return zero, false
@@ -56,16 +67,113 @@ func (s *linkedListStack[T]) Pop() (T, bool) {
 	return el.value, true
 }
 
-func (s *linkedListStack[T]) Peek() (T, bool) {
+func (s *linkedListStack[T]) TryPop() (T, bool) {
 	s.mut.Lock()
 	defer s.mut.Unlock()
 
+	return s.popUnsafe()
+}
+
+func (s *linkedListStack[T]) Pop(ctx context.Context) (T, error) {
+	if ctx.Err() != nil {
+		var zero T
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return zero, ErrTimeout
+		}
+		return zero, ErrCanceled
+	}
+
+	s.mut.Lock()
+	defer s.mut.Unlock()
+
+	ctxDone := make(chan struct{})
+
+	go func() {
+		<-ctx.Done()
+
+		close(ctxDone)
+
+		s.mut.Lock()
+		s.cond.Broadcast()
+		s.mut.Unlock()
+	}()
+
+	for {
+		if item, ok := s.popUnsafe(); ok {
+			return item, nil
+		}
+
+		select {
+		case <-ctxDone:
+			var zero T
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				return zero, ErrTimeout
+			}
+			return zero, ErrCanceled
+		default:
+		}
+
+		s.cond.Wait()
+	}
+}
+
+func (s *linkedListStack[T]) peekUnsafe() (T, bool) {
 	if s.top == nil {
 		var zero T
 		return zero, false
 	}
 
 	return s.top.value, true
+}
+
+func (s *linkedListStack[T]) TryPeek() (T, bool) {
+	s.mut.Lock()
+	defer s.mut.Unlock()
+
+	return s.peekUnsafe()
+}
+
+func (s *linkedListStack[T]) Peek(ctx context.Context) (T, error) {
+	if ctx.Err() != nil {
+		var zero T
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return zero, ErrTimeout
+		}
+		return zero, ErrCanceled
+	}
+
+	s.mut.Lock()
+	defer s.mut.Unlock()
+
+	ctxDone := make(chan struct{})
+
+	go func() {
+		<-ctx.Done()
+
+		close(ctxDone)
+
+		s.mut.Lock()
+		s.cond.Broadcast()
+		s.mut.Unlock()
+	}()
+
+	for {
+		if item, ok := s.peekUnsafe(); ok {
+			return item, nil
+		}
+
+		select {
+		case <-ctxDone:
+			var zero T
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				return zero, ErrTimeout
+			}
+			return zero, ErrCanceled
+		default:
+		}
+
+		s.cond.Wait()
+	}
 }
 
 func (s *linkedListStack[T]) Clear() {
@@ -88,5 +196,9 @@ func (s *linkedListStack[T]) IsEmpty() bool {
 }
 
 func New[T any]() Stack[T] {
-	return &linkedListStack[T]{}
+	var mut sync.Mutex
+	return &linkedListStack[T]{
+		mut:  &mut,
+		cond: sync.NewCond(&mut),
+	}
 }
