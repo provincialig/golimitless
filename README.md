@@ -1,3 +1,6 @@
+![License](https://img.shields.io/github/license/provincialig/golimitless)
+![Build](https://github.com/provincialig/golimitless/actions/workflows/test.yml/badge.svg)
+
 ## GoLimitless
 
 A set of tools to solve some GoLang limitations that lead to writing a lot of code.
