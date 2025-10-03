@@ -17,7 +17,7 @@ type ISlice[T comparable, K comparable] interface {
 
 type myIndexedSlice[T comparable, K comparable] struct {
 	m   map[T][]K
-	mut *sync.Mutex
+	mut sync.Mutex
 }
 
 func (is *myIndexedSlice[T, K]) Get(key T) ([]K, bool) {
@@ -82,8 +82,5 @@ func (is *myIndexedSlice[T, K]) IsEmpty(key T) bool {
 }
 
 func New[T comparable, K comparable]() ISlice[T, K] {
-	return &myIndexedSlice[T, K]{
-		m:   map[T][]K{},
-		mut: &sync.Mutex{},
-	}
+	return &myIndexedSlice[T, K]{m: map[T][]K{}}
 }

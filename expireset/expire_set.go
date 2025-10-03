@@ -17,7 +17,7 @@ type ExpireSet[T comparable] interface {
 
 type myExpireSet[T comparable] struct {
 	m   map[T]time.Time
-	mut *sync.Mutex
+	mut sync.Mutex
 }
 
 func (es *myExpireSet[T]) get(value T) (time.Time, bool) {
@@ -94,8 +94,5 @@ func (es *myExpireSet[T]) IsEmpty() bool {
 }
 
 func New[T comparable]() ExpireSet[T] {
-	return &myExpireSet[T]{
-		m:   map[T]time.Time{},
-		mut: &sync.Mutex{},
-	}
+	return &myExpireSet[T]{m: map[T]time.Time{}}
 }
