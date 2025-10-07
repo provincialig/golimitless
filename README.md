@@ -1,5 +1,7 @@
 ![License](https://img.shields.io/github/license/provincialig/golimitless)
-![Build](https://github.com/provincialig/golimitless/actions/workflows/test.yml/badge.svg)
+![Dependency](https://img.shields.io/badge/dependency-0-brightgreen)
+![Golangci-Lint version](https://img.shields.io/badge/golangci--lint-2.5.0-brightgreen)
+![Test](https://github.com/provincialig/golimitless/actions/workflows/test.yml/badge.svg)
 
 ## GoLimitless
 
@@ -29,6 +31,8 @@ go get github.com/provincialig/golimitless
   - **Reduce**
   - **ForEach**
   - **SliceToMap** / **MapToSlice**
+  
+- **Retrier**: A tool to run a function until an error returns.
 
 - **Sync**
   - **MutexBlock**: A tool used for execute many operations in safe block.
