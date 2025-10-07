@@ -33,6 +33,7 @@ go get github.com/provincialig/golimitless
   - **SliceToMap** / **MapToSlice**
   
 - **Retrier**: A tool to run a function until an error returns.
+- **Retainer**: A set that holds an object for a certain period of time.
 
 - **Sync**
   - **MutexBlock**: A tool used for execute many operations in safe block.
