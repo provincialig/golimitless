@@ -7,11 +7,10 @@ import (
 
 type ExpireSet[T comparable] interface {
 	Add(value T, retain time.Duration)
-	Has(value T) bool
+	Has(value T) (bool, time.Time)
 	Delete(value T)
-	ExpireTime(value T) (time.Time, bool)
-	Iterator(fn func(value T) bool)
 	Clear()
+	Size() int
 	IsEmpty() bool
 }
 
@@ -20,15 +19,17 @@ type myExpireSet[T comparable] struct {
 	mut sync.Mutex
 }
 
-func (es *myExpireSet[T]) get(value T) (time.Time, bool) {
+func (es *myExpireSet[T]) getUnsafe(value T) (time.Time, bool) {
+	var zero time.Time
+
 	v, ok := es.m[value]
 	if !ok {
-		return time.Time{}, false
+		return zero, false
 	}
 
 	if time.Now().After(v) {
 		delete(es.m, value)
-		return time.Time{}, false
+		return zero, false
 	}
 
 	return v, true
@@ -41,12 +42,12 @@ func (es *myExpireSet[T]) Add(value T, retain time.Duration) {
 	es.m[value] = time.Now().Add(retain)
 }
 
-func (es *myExpireSet[T]) Has(value T) bool {
+func (es *myExpireSet[T]) Has(value T) (bool, time.Time) {
 	es.mut.Lock()
 	defer es.mut.Unlock()
 
-	_, ok := es.get(value)
-	return ok
+	v, ok := es.getUnsafe(value)
+	return ok, v
 }
 
 func (es *myExpireSet[T]) Delete(value T) {
@@ -56,14 +57,6 @@ func (es *myExpireSet[T]) Delete(value T) {
 	delete(es.m, value)
 }
 
-func (es *myExpireSet[T]) ExpireTime(value T) (time.Time, bool) {
-	es.mut.Lock()
-	defer es.mut.Unlock()
-
-	v, ok := es.get(value)
-	return v, ok
-}
-
 func (es *myExpireSet[T]) Clear() {
 	es.mut.Lock()
 	defer es.mut.Unlock()
@@ -71,26 +64,35 @@ func (es *myExpireSet[T]) Clear() {
 	es.m = map[T]time.Time{}
 }
 
-func (es *myExpireSet[T]) Iterator(fn func(value T) bool) {
+func (es *myExpireSet[T]) Size() int {
 	es.mut.Lock()
 	defer es.mut.Unlock()
 
+	size := 0
+
 	for k := range es.m {
-		if _, ok := es.get(k); ok {
-			if !fn(k) {
-				return
-			}
+		if _, ok := es.getUnsafe(k); ok {
+			size++
 		}
 	}
+
+	return size
 }
 
 func (es *myExpireSet[T]) IsEmpty() bool {
-	found := false
-	es.Iterator(func(value T) bool {
-		found = true
-		return false
-	})
-	return !found
+	es.mut.Lock()
+	defer es.mut.Unlock()
+
+	isEmpty := true
+
+	for k := range es.m {
+		if _, ok := es.getUnsafe(k); ok {
+			isEmpty = false
+			break
+		}
+	}
+
+	return isEmpty
 }
 
 func New[T comparable]() ExpireSet[T] {

@@ -13,7 +13,7 @@ func Test_Expire(t *testing.T) {
 
 	time.Sleep(200 * time.Millisecond)
 
-	if es.Has(10) {
+	if ok, _ := es.Has(10); ok {
 		t.Fatal("Expire set should not have element 10")
 	}
 }
@@ -22,7 +22,7 @@ func Test_NotExpire(t *testing.T) {
 	es := expireset.New[int]()
 	es.Add(10, 2*time.Second)
 
-	if !es.Has(10) {
+	if ok, _ := es.Has(10); !ok {
 		t.Fatal("Expire set should have element 10")
 	}
 }
@@ -52,11 +52,11 @@ func Test_NotEmpty(t *testing.T) {
 func Test_Delete(t *testing.T) {
 	es := expireset.New[int]()
 	es.Add(42, 2*time.Second)
-	if !es.Has(42) {
+	if ok, _ := es.Has(42); !ok {
 		t.Fatal("should have 42 before delete")
 	}
 	es.Delete(42)
-	if es.Has(42) {
+	if ok, _ := es.Has(42); ok {
 		t.Fatal("should not have 42 after delete")
 	}
 }
@@ -64,32 +64,11 @@ func Test_Delete(t *testing.T) {
 func Test_ExpireTime(t *testing.T) {
 	es := expireset.New[int]()
 	es.Add(7, 500*time.Millisecond)
-	et, ok := es.ExpireTime(7)
+	ok, et := es.Has(7)
 	if !ok {
 		t.Fatal("ExpireTime should return true for existing element")
 	}
 	if time.Until(et) <= 0 {
 		t.Fatal("ExpireTime should be in the future")
-	}
-}
-
-func Test_Iterator_Clear(t *testing.T) {
-	es := expireset.New[int]()
-	es.Add(1, 5*time.Second)
-	es.Add(2, 5*time.Second)
-	es.Add(3, 5*time.Second)
-
-	sum := 0
-	es.Iterator(func(value int) bool {
-		sum += value
-		return true
-	})
-	if sum != 6 {
-		t.Fatalf("sum should be 6, got %d", sum)
-	}
-
-	es.Clear()
-	if !es.IsEmpty() {
-		t.Fatal("ExpireSet should be empty after Clear")
 	}
 }
